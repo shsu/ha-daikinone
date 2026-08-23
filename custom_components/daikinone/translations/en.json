@@ -1,0 +1,190 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect your Daikin One account",
+        "description": "Daikin One uses the official Integrator API. You need the account email, an Integrator Token and a developer API key from the SkyportHome app.",
+        "data": {
+          "email": "Email",
+          "api_key": "API key",
+          "integrator_token": "Integrator Token"
+        },
+        "data_description": {
+          "email": "The email address of your Daikin One (SkyportHome) account. Daikin treats it as case-sensitive, so type it exactly as it appears in the app.",
+          "api_key": "SkyportHome app: enable the developer menu, then SkyportCare > home integration > developer. Accept the terms and enter an app name to have the key issued.",
+          "integrator_token": "SkyportHome app: SkyportCare > home integration > get integration token. You type your account password in the app; it is never stored here."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Reauthenticate your Daikin One account",
+        "description": "Daikin One no longer accepts password logins. Enter the API key and the Integrator Token from the SkyportHome app to keep your existing devices and entities.",
+        "data": {
+          "email": "Email",
+          "api_key": "API key",
+          "integrator_token": "Integrator Token"
+        },
+        "data_description": {
+          "email": "The email address of your Daikin One (SkyportHome) account. Daikin treats it as case-sensitive, so type it exactly as it appears in the app.",
+          "api_key": "SkyportHome app: enable the developer menu, then SkyportCare > home integration > developer. Accept the terms and enter an app name to have the key issued.",
+          "integrator_token": "SkyportHome app: SkyportCare > home integration > get integration token. You type your account password in the app; it is never stored here."
+        }
+      },
+      "reconfigure": {
+        "title": "Update your Daikin One credentials",
+        "description": "Replace the stored credentials. The account email must stay the same, otherwise add a second entry instead.",
+        "data": {
+          "email": "Email",
+          "api_key": "API key",
+          "integrator_token": "Integrator Token"
+        },
+        "data_description": {
+          "email": "The email address of your Daikin One (SkyportHome) account. Daikin treats it as case-sensitive, so type it exactly as it appears in the app.",
+          "api_key": "SkyportHome app: enable the developer menu, then SkyportCare > home integration > developer. Accept the terms and enter an app name to have the key issued.",
+          "integrator_token": "SkyportHome app: SkyportCare > home integration > get integration token. You type your account password in the app; it is never stored here."
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "The email or the Integrator Token was rejected. Check the email spelling and issue a new token in the SkyportHome app.",
+      "invalid_api_key": "The API key was rejected. Issue a new key under SkyportCare > home integration > developer.",
+      "rate_limited": "Daikin rejected the request because of too many requests. Wait a few minutes and try again.",
+      "no_devices": "The credentials work, but the account has no thermostats. Add a thermostat in the Daikin One app first.",
+      "cannot_connect": "Could not reach the Daikin One API. Check your internet connection and try again.",
+      "unknown": "An unexpected error occurred."
+    },
+    "abort": {
+      "already_configured": "This Daikin One account is already configured.",
+      "reauth_successful": "Reauthentication was successful.",
+      "reconfigure_successful": "The credentials were updated.",
+      "wrong_account": "The credentials belong to a different Daikin One account."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Daikin One options",
+        "data": {
+          "scan_interval": "Polling interval"
+        },
+        "data_description": {
+          "scan_interval": "How often the thermostats are read, in seconds. Daikin's API usage limits require at least 180 seconds (3 minutes); a small random offset is added to each poll."
+        }
+      }
+    }
+  },
+  "entity": {
+    "climate": {
+      "thermostat": {
+        "state_attributes": {
+          "preset_mode": {
+            "state": {
+              "emergency_heat": "Emergency heat"
+            }
+          }
+        }
+      }
+    },
+    "sensor": {
+      "indoor_temperature": {
+        "name": "Indoor temperature"
+      },
+      "indoor_humidity": {
+        "name": "Indoor humidity"
+      },
+      "outdoor_temperature": {
+        "name": "Outdoor temperature"
+      },
+      "outdoor_humidity": {
+        "name": "Outdoor humidity"
+      },
+      "system_fan": {
+        "name": "System fan",
+        "state": {
+          "auto": "Auto",
+          "on": "On"
+        }
+      }
+    },
+    "binary_sensor": {
+      "online": {
+        "name": "Online"
+      },
+      "geofencing": {
+        "name": "Geofencing"
+      },
+      "heating": {
+        "name": "Heating"
+      },
+      "cooling": {
+        "name": "Cooling"
+      },
+      "dehumidifying": {
+        "name": "Dehumidifying"
+      },
+      "fan_running": {
+        "name": "Fan running"
+      }
+    },
+    "switch": {
+      "schedule": {
+        "name": "Schedule"
+      }
+    },
+    "select": {
+      "fan_circulate": {
+        "name": "Fan circulation",
+        "state": {
+          "off": "Off",
+          "always_on": "Always on",
+          "schedule": "Schedule"
+        }
+      },
+      "fan_speed": {
+        "name": "Fan circulation speed",
+        "state": {
+          "low": "Low",
+          "medium": "Medium",
+          "high": "High"
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "auth_failed": {
+      "message": "Daikin One rejected the credentials. Reauthenticate the integration with a new API key or Integrator Token."
+    },
+    "rate_limited": {
+      "message": "Daikin One rejected the request because of too many requests. Try again in a few minutes."
+    },
+    "device_offline": {
+      "message": "The thermostat is offline and cannot be controlled right now."
+    },
+    "invalid_request": {
+      "message": "Daikin One rejected the request as invalid."
+    },
+    "unsupported_capability": {
+      "message": "This equipment does not support fan circulation control. Only unitary systems accept it."
+    },
+    "write_failed": {
+      "message": "Could not send the change to Daikin One. Try again in a moment."
+    },
+    "setpoint_delta": {
+      "message": "The heat and cool setpoints must be at least {delta} °C apart."
+    },
+    "setpoint_out_of_range": {
+      "message": "The setpoint is outside the range the thermostat allows."
+    },
+    "single_setpoint_not_applicable": {
+      "message": "A single target temperature cannot be set in this mode; set a temperature range instead."
+    },
+    "state_unknown": {
+      "message": "The current thermostat state is unknown, so the change cannot be sent. Wait for the next update and try again."
+    }
+  },
+  "issues": {
+    "fan_controls_unsupported": {
+      "title": "Fan circulation is not supported by {name}",
+      "description": "Daikin rejected a fan circulation write for {name}. Fan circulation is a unitary-system feature; VRV (P1P2) and split (S21) systems ignore it and run the fan at maximum speed. Disable the \"Fan circulation\" and \"Fan circulation speed\" entities on the device page to hide these controls."
+    }
+  }
+}
