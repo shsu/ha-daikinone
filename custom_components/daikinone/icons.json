@@ -1,0 +1,45 @@
+{
+  "entity": {
+    "binary_sensor": {
+      "geofencing": {
+        "default": "mdi:map-marker-radius",
+        "state": {
+          "off": "mdi:map-marker-off"
+        }
+      }
+    },
+    "climate": {
+      "thermostat": {
+        "state_attributes": {
+          "preset_mode": {
+            "state": {
+              "emergency_heat": "mdi:fire-alert"
+            }
+          }
+        }
+      }
+    },
+    "sensor": {
+      "system_fan": {
+        "default": "mdi:fan"
+      }
+    },
+    "switch": {
+      "schedule": {
+        "default": "mdi:calendar-clock"
+      }
+    },
+    "select": {
+      "fan_circulate": {
+        "default": "mdi:fan",
+        "state": {
+          "off": "mdi:fan-off",
+          "schedule": "mdi:fan-clock"
+        }
+      },
+      "fan_speed": {
+        "default": "mdi:fan"
+      }
+    }
+  }
+}
