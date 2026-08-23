@@ -12,7 +12,7 @@ from homeassistant.components.sensor import (
     SensorEntityDescription,
     SensorStateClass,
 )
-from homeassistant.const import PERCENTAGE, EntityCategory, UnitOfTemperature
+from homeassistant.const import EntityCategory, UnitOfRatio, UnitOfTemperature
 from homeassistant.helpers.entity import Entity
 
 from .api import SystemFan, ThermostatState
@@ -63,7 +63,7 @@ SENSORS: Final[tuple[DaikinOneSensorDescription, ...]] = (
         translation_key="indoor_humidity",
         device_class=SensorDeviceClass.HUMIDITY,
         state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=PERCENTAGE,
+        native_unit_of_measurement=UnitOfRatio.PERCENTAGE,
         value_fn=lambda state: state.hum_indoor,
         legacy_name="Indoor Humidity",
     ),
@@ -82,7 +82,7 @@ SENSORS: Final[tuple[DaikinOneSensorDescription, ...]] = (
         translation_key="outdoor_humidity",
         device_class=SensorDeviceClass.HUMIDITY,
         state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=PERCENTAGE,
+        native_unit_of_measurement=UnitOfRatio.PERCENTAGE,
         value_fn=lambda state: state.hum_outdoor,
         legacy_name="Outdoor Humidity",
     ),

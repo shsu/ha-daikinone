@@ -189,7 +189,7 @@ class DaikinOneCoordinator(TimestampDataUpdateCoordinator[dict[str, Thermostat]]
                 continue
             if first_refresh and device.via_device_id is None:
                 continue
-            registry.async_update_device(device.id, remove_config_entry_id=entry_id)
+            registry.async_remove_device(device.id)
 
     # ------------------------------------------------------------------- writes
 

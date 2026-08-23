@@ -103,7 +103,8 @@ def async_setup_platform_entities(
             known.difference_update(
                 thermostat_id
                 for thermostat_id in gone
-                if registry.async_get_device(identifiers={(DOMAIN, thermostat_id)}) is None
+                if registry.async_get_device_by_identifier((DOMAIN, thermostat_id), coordinator.config_entry.entry_id)
+                is None
             )
         new_ids = [thermostat_id for thermostat_id in coordinator.data if thermostat_id not in known]
         if not new_ids:
