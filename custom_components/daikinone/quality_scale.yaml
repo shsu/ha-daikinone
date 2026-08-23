@@ -1,0 +1,91 @@
+# Integration Quality Scale ledger for `daikinone`.
+#
+# hassfest skips this file for custom integrations, so tests/test_quality_scale.py is the
+# gate: every rule from hassfest 2026.8.3 (script/hassfest/quality_scale.py ALL_RULES) must
+# be listed here as `done` or `exempt` with a comment. The manifest declares the tier this
+# ledger backs up.
+rules:
+  # --- Bronze ---------------------------------------------------------------
+  action-setup:
+    status: exempt
+    comment: |
+      The integration registers no custom actions; all control happens through the
+      standard climate, switch and select entity services.
+  appropriate-polling: done
+  # Verified out-of-band, not by the test suite: no offline check can see another repo, and
+  # the suite makes no network calls. home-assistant/brands master carries
+  # custom_integrations/daikinone/{icon,logo}.png - re-check with
+  #   curl -sf https://api.github.com/repos/home-assistant/brands/contents/custom_integrations/daikinone
+  # (brands.home-assistant.io is not a check: it serves a placeholder 200 for any domain).
+  brands: done
+  common-modules: done
+  config-flow: done
+  config-flow-test-coverage: done
+  dependency-transparency: done
+  docs-actions:
+    status: exempt
+    comment: No custom actions are provided; the README states this explicitly.
+  docs-conditions:
+    status: exempt
+    comment: The integration provides no custom conditions.
+  docs-high-level-description: done
+  docs-installation-instructions: done
+  docs-removal-instructions: done
+  docs-triggers:
+    status: exempt
+    comment: The integration provides no custom triggers.
+  entity-event-setup: done
+  entity-unique-id: done
+  has-entity-name: done
+  runtime-data: done
+  test-before-configure: done
+  test-before-setup: done
+  unique-config-entry: done
+
+  # --- Silver ---------------------------------------------------------------
+  action-exceptions: done
+  config-entry-unloading: done
+  docs-configuration-parameters: done
+  docs-installation-parameters: done
+  entity-unavailable: done
+  integration-owner: done
+  log-when-unavailable: done
+  parallel-updates: done
+  reauthentication-flow: done
+  test-coverage: done
+
+  # --- Gold -----------------------------------------------------------------
+  devices: done
+  diagnostics: done
+  discovery:
+    status: exempt
+    comment: |
+      Thermostats are reached only through Daikin's cloud account; there is nothing to
+      discover on the local network and the official API exposes no discovery endpoint.
+  discovery-update-info:
+    status: exempt
+    comment: |
+      No local network information is used - the cloud API addresses devices by opaque
+      identifier, so there is no host or port to keep up to date.
+  docs-data-update: done
+  docs-examples: done
+  docs-known-limitations: done
+  docs-supported-devices: done
+  docs-supported-functions: done
+  docs-troubleshooting: done
+  docs-use-cases: done
+  dynamic-devices: done
+  entity-category: done
+  entity-device-class: done
+  entity-disabled-by-default: done
+  entity-translations: done
+  exception-translations: done
+  icon-translations: done
+  reconfiguration-flow: done
+  repair-issues: done
+  stale-devices: done
+
+  # --- Platinum -------------------------------------------------------------
+  async-dependency: done
+  inject-websession: done
+  strict-typing: done
