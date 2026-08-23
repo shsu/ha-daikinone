@@ -1,0 +1,9 @@
+[
+  {
+    "locationName": "Home",
+    "devices": [
+      {"name": "Ghost", "model": "ONEPLUS", "firmwareVersion": "3.1.7"},
+      {"id": "dev1", "name": "Main Floor", "model": "ONEPLUS", "firmwareVersion": "3.1.7"}
+    ]
+  }
+]

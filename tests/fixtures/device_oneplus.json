@@ -1,0 +1,20 @@
+{
+  "equipmentStatus": 1,
+  "mode": 3,
+  "modeLimit": 1,
+  "modeEmHeatAvailable": 1,
+  "fan": 0,
+  "fanCirculate": 0,
+  "fanCirculateSpeed": 1,
+  "heatSetpoint": 20.0,
+  "coolSetpoint": 24.0,
+  "setpointDelta": 2.0,
+  "setpointMinimum": 10.0,
+  "setpointMaximum": 32.0,
+  "tempIndoor": 21.1,
+  "humIndoor": 45,
+  "tempOutdoor": 30.5,
+  "humOutdoor": 60,
+  "scheduleEnabled": true,
+  "geofencingEnabled": false
+}

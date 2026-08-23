@@ -1,0 +1,13 @@
+[
+  {
+    "locationName": "Home",
+    "devices": [
+      {"id": "dev1", "name": "T1", "model": "ONEPLUS", "firmwareVersion": "3.1.7"},
+      {"id": "dev2", "name": "T2", "model": "ONEPLUS", "firmwareVersion": "3.1.7"},
+      {"id": "dev3", "name": "T3", "model": "ONEPLUS", "firmwareVersion": "3.1.7"},
+      {"id": "dev4", "name": "T4", "model": "ONEPLUS", "firmwareVersion": "3.1.7"},
+      {"id": "dev5", "name": "T5", "model": "ONEPLUS", "firmwareVersion": "3.1.7"},
+      {"id": "dev6", "name": "T6", "model": "ONEPLUS", "firmwareVersion": "3.1.7"}
+    ]
+  }
+]

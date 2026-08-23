@@ -1,0 +1,294 @@
+{
+  "_comment": "Hand-transcribed snapshot of the official Daikin One Open API documentation. Used by tests/test_api_spec_conformance.py (strict) and scripts/check_spec_drift.py (compares against the live pages). Update ONLY from the official pages.",
+  "source": {
+    "overview": "https://www.daikinone.com/openapi/overview/index.html",
+    "documentation": "https://www.daikinone.com/openapi/documentation/index.html",
+    "examples": "https://www.daikinone.com/openapi/examples/index.html",
+    "documentation_last_updated": "January 14, 2026",
+    "overview_last_updated": "January 14, 2026",
+    "examples_last_updated": "April 10, 2023"
+  },
+  "base_url": "https://integrator-api.daikinskyport.com",
+  "tls_minimum": "1.2",
+  "headers": {
+    "api_key_header": "x-api-key",
+    "authorization_header": "Authorization",
+    "authorization_scheme": "Bearer",
+    "content_type": "application/json"
+  },
+  "endpoints": {
+    "token": {
+      "method": "POST",
+      "path": "/v1/token",
+      "requires_authorization_header": false,
+      "request_keys": [
+        "email",
+        "integratorToken"
+      ],
+      "response_keys": [
+        "accessToken",
+        "accessTokenExpiresIn",
+        "tokenType"
+      ],
+      "token_type": "Bearer",
+      "expires_in_example": 900,
+      "notes": "email is case sensitive; a new token does not invalidate previously issued tokens; no refresh flow"
+    },
+    "devices": {
+      "method": "GET",
+      "path": "/v1/devices",
+      "requires_authorization_header": true,
+      "response_shape": "array of locations",
+      "location_keys": [
+        "locationName",
+        "devices"
+      ],
+      "device_keys": [
+        "id",
+        "name",
+        "model",
+        "firmwareVersion"
+      ],
+      "observed_models": [
+        "ONEPLUS",
+        "TOUCH"
+      ]
+    },
+    "device": {
+      "method": "GET",
+      "path": "/v1/devices/{id}",
+      "requires_authorization_header": true,
+      "response_keys": [
+        "equipmentStatus",
+        "mode",
+        "modeLimit",
+        "modeEmHeatAvailable",
+        "fan",
+        "fanCirculate",
+        "fanCirculateSpeed",
+        "heatSetpoint",
+        "coolSetpoint",
+        "setpointDelta",
+        "setpointMinimum",
+        "setpointMaximum",
+        "tempIndoor",
+        "humIndoor",
+        "tempOutdoor",
+        "humOutdoor",
+        "scheduleEnabled",
+        "geofencingEnabled"
+      ],
+      "notes": "name/model/firmwareVersion/locationName are NOT documented in this response; only GET /v1/devices carries them"
+    },
+    "msp": {
+      "method": "PUT",
+      "path": "/v1/devices/{id}/msp",
+      "requires_authorization_header": true,
+      "request_keys": [
+        "mode",
+        "heatSetpoint",
+        "coolSetpoint"
+      ],
+      "all_fields_required": true,
+      "validation": "heatSetpoint <= coolSetpoint - setpointDelta; both within [setpointMinimum, setpointMaximum]",
+      "side_effects": [
+        "turns off schedule",
+        "turns off away state"
+      ],
+      "response_keys": [
+        "message"
+      ]
+    },
+    "schedule": {
+      "method": "PUT",
+      "path": "/v1/devices/{id}/schedule",
+      "requires_authorization_header": true,
+      "request_keys": [
+        "scheduleEnabled"
+      ],
+      "response_keys": [
+        "message"
+      ],
+      "notes": "away state takes priority over schedule; schedule contents are not readable or writable"
+    },
+    "fan": {
+      "method": "PUT",
+      "path": "/v1/devices/{id}/fan",
+      "requires_authorization_header": true,
+      "request_keys": [
+        "fanCirculate",
+        "fanCirculateSpeed"
+      ],
+      "unitary_only": true,
+      "response_keys": [
+        "message"
+      ],
+      "notes": "VRV(P1P2) and Single/Multi-Split(S21) equipment types do not support fan circulation mode or speed; fan runs maximum speed; no capability field exists in any payload"
+    }
+  },
+  "field_types": {
+    "equipmentStatus": "int",
+    "mode": "int",
+    "modeLimit": "int",
+    "modeEmHeatAvailable": "int_or_bool",
+    "fan": "int",
+    "fanCirculate": "int",
+    "fanCirculateSpeed": "int",
+    "heatSetpoint": "float",
+    "coolSetpoint": "float",
+    "setpointDelta": "float",
+    "setpointMinimum": "float",
+    "setpointMaximum": "float",
+    "tempIndoor": "float",
+    "humIndoor": "float",
+    "tempOutdoor": "float",
+    "humOutdoor": "float",
+    "scheduleEnabled": "bool",
+    "geofencingEnabled": "bool"
+  },
+  "writable_fields": [
+    "mode",
+    "heatSetpoint",
+    "coolSetpoint",
+    "scheduleEnabled",
+    "fanCirculate",
+    "fanCirculateSpeed"
+  ],
+  "enums": {
+    "mode": {
+      "0": "off",
+      "1": "heat",
+      "2": "cool",
+      "3": "auto",
+      "4": "emergency_heat"
+    },
+    "modeLimit": {
+      "0": "none",
+      "1": "all",
+      "2": "heat_only",
+      "3": "cool_only"
+    },
+    "equipmentStatus": {
+      "1": "cool",
+      "2": "overcool_dehum",
+      "3": "heat",
+      "4": "fan",
+      "5": "idle"
+    },
+    "fan": {
+      "0": "auto",
+      "1": "on"
+    },
+    "fanCirculate": {
+      "0": "off",
+      "1": "always_on",
+      "2": "schedule"
+    },
+    "fanCirculateSpeed": {
+      "0": "low",
+      "1": "medium",
+      "2": "high"
+    }
+  },
+  "units": {
+    "temperature": "celsius",
+    "setpoint_increment_c": 0.1,
+    "thermostat_ui_rounding_c": 0.5,
+    "setpoint_delta_increment_c": 0.5
+  },
+  "status_codes": {
+    "200": "OK - Request succeeded",
+    "400": "Bad request - problem with the request parameters",
+    "401": "Unauthorized - The accessToken is not valid",
+    "403": "Forbidden - The integratorApiKey is not valid",
+    "415": "Unsupported Media Type - Content-Type is not application/json",
+    "429": "Too Many Requests - Rate of API calls is too high",
+    "500": "Internal error"
+  },
+  "error_body_keys": [
+    "messages",
+    "message"
+  ],
+  "documented_messages": [
+    "Success",
+    "NotAuthorizedException",
+    "Invalid request body",
+    "DeviceOfflineException"
+  ],
+  "write_success_message": "Write sent",
+  "limits": {
+    "write_settle_seconds": 15,
+    "poll_min_seconds": 180,
+    "max_open_requests": 3
+  },
+  "supported_thermostats": [
+    "Daikin One+ Thermostat",
+    "Daikin One Touch Thermostat",
+    "Daikin One Lite Thermostat",
+    "Amana Smart Thermostat",
+    "Goodman Connected GTST"
+  ],
+  "examples": {
+    "token_response": {
+      "accessToken": "accessToken",
+      "accessTokenExpiresIn": 900,
+      "tokenType": "Bearer"
+    },
+    "device_response_2023": {
+      "fanCirculate": 1,
+      "tempIndoor": 23.1,
+      "mode": 0,
+      "humIndoor": 42,
+      "setpointMinimum": 10,
+      "fan": 0,
+      "tempOutdoor": 14,
+      "equipmentStatus": 4,
+      "setpointDelta": 2,
+      "modeEmHeatAvailable": false,
+      "coolSetpoint": 20,
+      "setpointMaximum": 32,
+      "humOutdoor": 44,
+      "geofencingEnabled": false,
+      "heatSetpoint": 17.1,
+      "scheduleEnabled": false,
+      "modeLimit": 1,
+      "fanCirculateSpeed": 2
+    },
+    "device_response_schema_stub": {
+      "equipmentStatus": 0,
+      "mode": 0,
+      "modeLimit": 1,
+      "modeEmHeatAvailable": 0,
+      "fan": 0,
+      "fanCirculate": 1,
+      "fanCirculateSpeed": 1,
+      "heatSetpoint": 20.5,
+      "coolSetpoint": 23.5,
+      "setpointDelta": 2,
+      "setpointMinimum": 10.0,
+      "setpointMaximum": 32.3,
+      "tempIndoor": 21.5,
+      "humIndoor": 50,
+      "tempOutdoor": 20.5,
+      "humOutdoor": 50,
+      "scheduleEnabled": false,
+      "geofencingEnabled": false
+    }
+  },
+  "undocumented_but_observed": {
+    "equipment_status_hidden_values": {
+      "6": "waiting to cool",
+      "7": "waiting to heat",
+      "8": "aux humidifier",
+      "9": "aux dehumidifier"
+    },
+    "notes": "present only inside an HTML comment in the docs; equipmentStatus 0 appears in the schema stub with no documented meaning; treat all of these as UNKNOWN",
+    "live_observed_2026_08_23": {
+      "equipmentCommunication": "int field present in GET /v1/devices/{id} on ONEPLUS firmware 4.0.17; not in the documented schema; ignored by the models",
+      "modeEmHeatAvailable_wire_type": "bool",
+      "error_body_key_on_400": "message (singular; docs claim plural 'messages')",
+      "bad_email_or_token_on_token_endpoint": "400 NotAuthorizedException",
+      "token_response": "accessTokenExpiresIn 900, tokenType Bearer, accessToken ~973 chars"
+    }
+  }
+}

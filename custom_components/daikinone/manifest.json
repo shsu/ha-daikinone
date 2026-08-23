@@ -1,0 +1,15 @@
+{
+  "domain": "daikinone",
+  "name": "Daikin One",
+  "codeowners": [
+    "@shsu"
+  ],
+  "config_flow": true,
+  "documentation": "https://github.com/shsu/ha-daikinone",
+  "integration_type": "hub",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/shsu/ha-daikinone/issues",
+  "quality_scale": "platinum",
+  "requirements": [],
+  "version": "1.0.0"
+}
