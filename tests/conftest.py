@@ -10,7 +10,7 @@ from __future__ import annotations
 import asyncio
 from collections.abc import AsyncGenerator, Callable, Coroutine
 import re
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from unittest.mock import patch
 
 from homeassistant.const import CONF_API_KEY, CONF_EMAIL, CONF_PASSWORD
@@ -21,6 +21,7 @@ from pytest_homeassistant_custom_component.common import (
     load_json_array_fixture,
     load_json_object_fixture,
 )
+from pytest_homeassistant_custom_component.syrupy import HomeAssistantSnapshotExtension
 from pytest_homeassistant_custom_component.test_util.aiohttp import (
     AiohttpClientMocker,
     AiohttpClientMockResponse,
@@ -31,6 +32,9 @@ from custom_components.daikinone.const import (
     CONF_UID_SCHEMA,
     DOMAIN,
 )
+
+if TYPE_CHECKING:
+    from syrupy.assertion import SnapshotAssertion
 
 BASE = "https://integrator-api.daikinskyport.com"
 TOKEN_URL = f"{BASE}/v1/token"
@@ -51,6 +55,19 @@ PUT_URL_RE = re.compile(rf"{re.escape(DEVICES_URL)}/[^/]+/(msp|schedule|fan)$")
 @pytest.fixture(autouse=True)
 def _auto_enable_custom_integrations(enable_custom_integrations: None) -> None:
     """Enable loading custom integrations in all tests."""
+
+
+@pytest.fixture
+def snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:
+    """Pin the Home Assistant snapshot extension.
+
+    Both syrupy and pytest-homeassistant-custom-component provide a ``snapshot``
+    fixture; which one wins depends on plugin load order, which varies between
+    environments (it differed between macOS and the Linux CI runner). A conftest
+    fixture always outranks plugin fixtures, so this makes the HA extension (and
+    its ``snapshots/`` directory) deterministic everywhere.
+    """
+    return snapshot.use_extension(HomeAssistantSnapshotExtension)
 
 
 @pytest.fixture
