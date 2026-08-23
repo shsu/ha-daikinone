@@ -1,15 +1,19 @@
 #!/usr/bin/env python3
 """Read-only live verification of the Daikin One Open API against a real account.
 
-Credentials are read by this script itself from ``.env.test`` in the repository root, so no
-secret ever passes through a shell command line, a log, or another tool's output. Shapes are
-validated BEFORE any network call, because the two long credentials are easy to swap.
+Credentials are read by this script itself, so no secret ever passes through a shell command
+line, a log, or another tool's output. Sources, in order: DAIKINONE_* environment variables,
+an ``.env.test`` file in the repository root when one exists, or a 1Password item fetched with
+the 1Password CLI when ``--op-item NAME`` is given (field labels must match the variable
+names). Shapes are validated BEFORE any network call, because the two long credentials are
+easy to swap.
 
 Nothing secret is ever printed: not the email, API key, integrator token or access token, and
 not the device ids, device names or location names. Devices and locations appear as stable
 aliases (``dev-1``, ``loc-1``) assigned in the order the API returns them.
 
     uv run python scripts/live_check.py                    # read-only, <= 120 s
+    uv run python scripts/live_check.py --op-item homeassistant   # credentials from 1Password
     uv run python scripts/live_check.py --write-test       # toggles scheduleEnabled, then restores it
     uv run python scripts/live_check.py --bad-token --bad-key
     uv run python scripts/live_check.py --self-test        # offline assertions, no network, no .env
@@ -25,7 +29,9 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
+import subprocess
 import sys
 import time
 from typing import Any
@@ -99,7 +105,7 @@ def looks_like_jwe(value: str) -> bool:
 
 def shape_problems(env: dict[str, str]) -> list[str]:
     """Plain-language complaints about missing or swapped credentials. Empty list == fine."""
-    problems = [f"{key} is missing from {ENV_FILE.name}." for key in REQUIRED_KEYS if not env.get(key)]
+    problems = [f"{key} is missing." for key in REQUIRED_KEYS if not env.get(key)]
     if problems:
         return problems
 
@@ -509,6 +515,37 @@ def self_test() -> int:
     return 0
 
 
+def load_credentials(op_item: str | None) -> tuple[dict[str, str], str] | None:
+    """Return (credentials, source label), or None when nothing provides them."""
+    from_env = {key: os.environ[key] for key in REQUIRED_KEYS if os.environ.get(key)}
+    if len(from_env) == len(REQUIRED_KEYS):
+        return from_env, "environment variables"
+    if ENV_FILE.exists():
+        return parse_env(ENV_FILE.read_text(encoding="utf-8")), ENV_FILE.name
+    if op_item:
+        try:
+            proc = subprocess.run(
+                ["op", "item", "get", op_item, "--format", "json"],
+                capture_output=True,
+                text=True,
+                timeout=90,
+                check=True,
+            )
+        except FileNotFoundError:
+            print("ABORT: the 1Password CLI (op) is not installed.")
+            return None
+        except subprocess.TimeoutExpired:
+            print("ABORT: op stalled; approve the 1Password authorization prompt and re-run.")
+            return None
+        except subprocess.CalledProcessError as err:
+            print(f"ABORT: op item get {op_item!r} failed: {err.stderr.strip()[:120]}")
+            return None
+        item = json.loads(proc.stdout)
+        fields = {f.get("label"): f.get("value") for f in item.get("fields", []) if f.get("label")}
+        return {key: fields[key] for key in REQUIRED_KEYS if fields.get(key)}, f"1Password item {op_item!r}"
+    return None
+
+
 def main(argv: list[str] | None = None) -> int:
     """Parse arguments, validate credential shapes, then run the requested checks."""
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -520,21 +557,30 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--self-test", action="store_true", help="run offline assertions and exit (no network, no .env)"
     )
+    parser.add_argument(
+        "--op-item",
+        default=os.environ.get("DAIKINONE_OP_ITEM"),
+        help="1Password item to read DAIKINONE_* fields from when no env vars or .env.test exist",
+    )
     args = parser.parse_args(argv)
 
     if args.self_test:
         return self_test()
 
-    if not ENV_FILE.exists():
-        print(f"ABORT: {ENV_FILE} does not exist. Expected keys: {', '.join(REQUIRED_KEYS)}.")
+    loaded = load_credentials(args.op_item)
+    if loaded is None:
+        print(
+            f"ABORT: no credentials. Provide {', '.join(REQUIRED_KEYS)} as environment variables, "
+            f"an {ENV_FILE.name} file, or --op-item <1Password item>."
+        )
         return 2
-    env = parse_env(ENV_FILE.read_text(encoding="utf-8"))
+    env, source = loaded
     problems = shape_problems(env)
     if problems:
-        print(f"ABORT: {ENV_FILE.name} is not usable yet.\n")
+        print(f"ABORT: credentials from {source} are not usable yet.\n")
         for problem in problems:
             print(f"  - {problem}")
-        print("\nNo network request was made. Fix the file and re-run; no value was printed.")
+        print("\nNo network request was made. Fix the source and re-run; no value was printed.")
         return 2
 
     spec = json.loads(SPEC_FILE.read_text(encoding="utf-8"))
@@ -549,7 +595,7 @@ def main(argv: list[str] | None = None) -> int:
 
     print(f"Daikin One live check - {BASE_URL}")
     print(
-        f"credentials: {ENV_FILE.name} (api-key fp {fingerprint(env['DAIKINONE_API_KEY'])}, "
+        f"credentials: {source} (api-key fp {fingerprint(env['DAIKINONE_API_KEY'])}, "
         f"token fp {fingerprint(env['DAIKINONE_INTEGRATOR_TOKEN'])}); values are never printed"
     )
 
